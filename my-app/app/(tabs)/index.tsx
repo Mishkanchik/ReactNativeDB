@@ -1,22 +1,19 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet, FlatList, View, Text } from 'react-native';
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import {  StyleSheet, FlatList, View, Text } from 'react-native';
+
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {ICategoryItem} from "@/app/(tabs)/types";
+import {ICategoryItem} from "@/interfaces/category/ICategoryItem";
+import {useGetCategoriesQuery} from "@/services/categoryService";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 export default function HomeScreen() {
-    const [categories, setCategories] = useState<ICategoryItem[]>([]);
 
-    useEffect(() => {
-        const url = "http://10.0.2.2:5109/api/categories";
-        axios.get<ICategoryItem[]>(url)
-            .then(resp=> setCategories(resp.data))
-            .catch(errors => console.error("Error", errors));
-    }, []);
+    //Підключаємо спеціальних хук для списку категорій
+    const {data: categories, isLoading} = useGetCategoriesQuery();
+    console.log("IsLoading", isLoading);
 
     const renderCategory = ({ item }: { item: ICategoryItem }) => (
         <View style={styles.card}>
@@ -31,10 +28,7 @@ export default function HomeScreen() {
     return (
         <>
 
-            {/*<ThemedView style={styles.titleContainer}>*/}
-            {/*    <ThemedText type="title">Категорії</ThemedText>*/}
-            {/*    <HelloWave />*/}
-            {/*</ThemedView>*/}
+            <LoadingOverlay visible={isLoading} />
 
             {/* тут відмальовуємо список */}
             <FlatList
